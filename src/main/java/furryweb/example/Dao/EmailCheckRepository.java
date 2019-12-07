@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
  * Created by Administrator on 2019/10/24.
  */
 @Repository
-public interface EmailCheckRepository extends JpaRepository<EmailCheckEntity,String> {
+public interface EmailCheckRepository extends JpaRepository<EmailCheckEntity, String> {
     EmailCheckEntity findByUserEmail(String user_email);
 }
