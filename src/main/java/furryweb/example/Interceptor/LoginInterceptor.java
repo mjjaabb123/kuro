@@ -11,28 +11,37 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  * Created by Administrator on 2019/10/10.
  */
-public class LoginInterceptor implements HandlerInterceptor{
+public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        String token = request.getHeader("token");
-        if(JwtUtil.getUserIdByparserJavaWebToken(token) != 0){
+        String accessToken = request.getHeader("access_token");
+        String refreshToken = request.getHeader("refresh_token");
+        if (JwtUtil.getUserIdByparserJavaWebToken(accessToken) != -1) {
             //表示token合法
             return true;
-        }else{
-
-            response.sendError(SC_UNAUTHORIZED);
+        } else if (JwtUtil.getUserIdByparserJavaWebToken(refreshToken)!=-1) {
+            Map<String, Object> jwtClaims = new HashMap();
+            jwtClaims.put("userId",JwtUtil.getUserIdByparserJavaWebToken(refreshToken));
+            response.setHeader("access_token",JwtUtil.createAccessJavaWebToken(jwtClaims));
+            response.setHeader("refresh_token",JwtUtil.createRefreshJavaWebToken(jwtClaims));
+            return true;
+        } else {
             System.out.println(request.getRequestURI());
+            response.setStatus(SC_UNAUTHORIZED);
             //token不合法或者过期
             return false;
         }
     }
+
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {
 

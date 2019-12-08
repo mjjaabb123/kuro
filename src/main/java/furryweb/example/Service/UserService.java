@@ -74,7 +74,6 @@ public class UserService {
     public Map<String, Object> getUserCentreInfo(int userId) {
         UserInfoEntity userInfoEntity = userRepository.findByUserId(userId);
         Map<String, Object> userInfo = new HashMap<>();
-        String identity = "普通用户";
         try {
             userInfo.put("name", userInfoEntity.getUserName());
             userInfo.put("qq", userInfoEntity.getUserQq());
@@ -82,13 +81,7 @@ public class UserService {
             userInfo.put("qqShow", userInfoEntity.getUserQQShow());
             userInfo.put("email", userInfoEntity.getUserEmail());
             userInfo.put("icon", userInfoEntity.getUserIcon());
-            if (userInfoEntity.getUserIdentity() == 0) {
-                identity = "普通用户";
-            }
-            if (userInfoEntity.getUserIdentity() == 1) {
-                identity = "绘画师";
-            }
-            userInfo.put("identity", identity);
+            userInfo.put("identity", userInfoEntity.getUserIdentity());
             return userInfo;
         } catch (Exception e) {
             e.printStackTrace();
@@ -131,7 +124,15 @@ public class UserService {
         identityInfoRepository.save(identityInfoEntity);
     }
 
+    public void setIdentity(int identity,int userId){
+        UserInfoEntity userInfoEntity= userRepository.findByUserId(userId);
+        userInfoEntity.setUserIdentity(identity);
+        userRepository.save(userInfoEntity);
+    }
     public boolean getUserVerifyInfo(int userId){
         return userRepository.findByUserId(userId).isUserIdentityVerify();
+    }
+    public int getUserIdentity(int userId){
+        return userRepository.findByUserId(userId).getUserIdentity();
     }
 }

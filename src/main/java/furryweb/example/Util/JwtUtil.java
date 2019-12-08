@@ -14,6 +14,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by Administrator on 2019/10/11.
@@ -21,7 +22,8 @@ import java.util.Map;
 
 @Component
 public class JwtUtil {
-    private static final int EXPSECOND= 60*60*5*1000;
+    private static final int AcEXPSECOND= 60*60*3*1000;
+    private static final int ReEXPSECOND = 60*60*24*7*1000;
     static final String TOKEN_PREFIX = "Bearer";
     private static Key getKeyInstance() {
         //We will sign our JavaWebToken with our ApiKey secret
@@ -30,21 +32,29 @@ public class JwtUtil {
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
         return signingKey;
     }
-    public static String createJavaWebToken(Map<String, Object> claims) {
+    public static String createRefreshJavaWebToken(Map<String, Object> claims) {
         Long now = System.currentTimeMillis();
-        Long expMills = now + EXPSECOND;
+        Long expMills = now + ReEXPSECOND;
         System.out.println("到期时间:"+new Date(expMills));
         Date expDate = new Date(expMills);
         return Jwts.builder().setClaims(claims).setExpiration(expDate).signWith(SignatureAlgorithm.HS256, getKeyInstance()).compact();
-
     }
+
+    public static String createAccessJavaWebToken(Map<String,Object> claims){
+        Long now = System.currentTimeMillis();
+        Long expMills = now + AcEXPSECOND;
+        System.out.println("到期时间:"+new Date(expMills));
+        Date expDate = new Date(expMills);
+        return Jwts.builder().setClaims(claims).setExpiration(expDate).signWith(SignatureAlgorithm.HS256, getKeyInstance()).compact();
+    }
+
     public static int getUserIdByparserJavaWebToken(String jwt) {
         try {
             Map<String, Object> jwtClaims =
                     Jwts.parser().setSigningKey(getKeyInstance()).parseClaimsJws(jwt).getBody();
             return (Integer)jwtClaims.get("userId");
         } catch (Exception e) {
-            return 0;
+            return -1;
         }
     }
 

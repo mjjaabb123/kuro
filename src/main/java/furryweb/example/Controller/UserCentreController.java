@@ -11,6 +11,7 @@ import furryweb.example.Util.UuidUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +38,9 @@ public class UserCentreController {
     @Autowired
     private UserService userService;
 
+    @Value("${web.upload-path}")
+    private String webUploadPath;
+
     private static final Logger logger = LoggerFactory.getLogger(UserCentreController.class);
 
 
@@ -62,7 +66,7 @@ public class UserCentreController {
         int begin = file.getOriginalFilename().indexOf(".");
         int last = file.getOriginalFilename().length();
         String fileName = UuidUtil.getUUID() + file.getOriginalFilename().substring(begin, last);
-        String localPath = "H:\\picture";
+        String localPath = webUploadPath;
         if (FileUtil.upload(file, localPath, fileName)) {
             // 上传成功，给出页面提示
             Map<String, Object> iconName = new HashMap<>();
@@ -80,7 +84,7 @@ public class UserCentreController {
             Map<String, Object> userCentreInfo = userService.getUserCentreInfo(userId);
             if (userCentreInfo != null) {
                 return new Result(200, "返回用户信息", userCentreInfo);
-            }else {
+            } else {
                 return Result.error(551, "返回用户信息失败");
             }
         } catch (Exception e) {
@@ -110,7 +114,7 @@ public class UserCentreController {
             return Result.error(610, "上传失败");
         }
         List<String> filesName = new ArrayList<>();
-        String localPath = "H:\\identity";
+        String localPath = webUploadPath;
         for (int i = 0; i < file.length; i++) {
             int begin = file[i].getOriginalFilename().indexOf(".");
             int last = file[i].getOriginalFilename().length();
@@ -139,10 +143,31 @@ public class UserCentreController {
         }
     }
 
-    /*@RequestMapping(value = "/alteridentity/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/alteridentity/{userId}", method = RequestMethod.PUT)
     public Result alteridentity(@RequestBody int identity, @PathVariable("userId") int userId) {
-        if (userService.getUserVerifyInfo(userId)) {
-
+        try {
+            if (userService.getUserVerifyInfo(userId)) {
+                userService.setIdentity(identity, userId);
+                return new Result(200, "身份更改成功");
+            }
+            response.setStatus(400);
+            return Result.error(623, "请先进行画师认证");
+        } catch (Exception e) {
+            response.setStatus(500);
+            return Result.error(624, "身份更改失败");
         }
-    }*/
+    }
+
+    @RequestMapping(value = "/getidentity/{userId}", method = RequestMethod.GET)
+    public Result getIdentity(@PathVariable int userId) {
+        try {
+            Map<String,Object> identity = new HashMap<>();
+            identity.put("identity",userService.getUserIdentity(userId));
+            identity.put("verify",userService.getUserVerifyInfo(userId));
+            return new Result(200,"返回身份信息成功",identity);
+        }catch (Exception e){
+            response.setStatus(500);
+            return Result.error(625,"返回身份信息失败");
+        }
+    }
 }
