@@ -4,6 +4,8 @@ import furryweb.example.Model.*;
 import furryweb.example.Service.MailService;
 import furryweb.example.Service.UserService;
 import furryweb.example.Util.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,8 @@ public class UserController {
 
     @Autowired
     private MailService mailService;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -89,6 +93,7 @@ public class UserController {
             EmailCheckEntity emailCheckEntity = new EmailCheckEntity(email.getEmail(),checkCode,updateTime,updateTime,expireTime);
             mailService.postEmailCheckCode(emailCheckEntity);
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(500);
             return Result.error(407,"验证码发送失败");
         }
@@ -136,6 +141,7 @@ public class UserController {
             EmailCheckEntity emailCheckEntity = new EmailCheckEntity(userEmail,checkCode,updateTime,updateTime,expireTime);
             mailService.postEmailCheckCode(emailCheckEntity);
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(500);
             return Result.error(407,"验证码发送失败");
         }

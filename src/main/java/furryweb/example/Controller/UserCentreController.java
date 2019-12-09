@@ -89,6 +89,7 @@ public class UserCentreController {
                 return Result.error(551, "返回用户信息失败");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(500);
             return Result.error(551, "返回用户信息失败");
         }
@@ -104,6 +105,7 @@ public class UserCentreController {
             userService.alterPassword(userId, alterPasswordForm.getNewPassword());
             return new Result(200, "密码修改成功");
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(500);
             return Result.error(621, "修改密码失败");
         }
@@ -154,6 +156,7 @@ public class UserCentreController {
             response.setStatus(400);
             return Result.error(623, "请先进行画师认证");
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(500);
             return Result.error(624, "身份更改失败");
         }
@@ -167,6 +170,7 @@ public class UserCentreController {
             identity.put("verify",userService.getUserVerifyInfo(userId));
             return new Result(200,"返回身份信息成功",identity);
         }catch (Exception e){
+            e.printStackTrace();
             response.setStatus(500);
             return Result.error(625,"返回身份信息失败");
         }
