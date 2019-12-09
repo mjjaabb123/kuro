@@ -27,6 +27,7 @@ import java.util.Map;
 /**
  * Created by Administrator on 2019/11/7.
  */
+@RequestMapping(value = "/api")
 @RestController
 public class UserCentreController {
     @Autowired

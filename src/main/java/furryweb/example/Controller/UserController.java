@@ -18,6 +18,7 @@ import java.util.Random;
 /**
  * Created by Administrator on 2019/9/29.
  */
+@RequestMapping(value ="/api")
 @RestController
 public class UserController {
     @Autowired
