@@ -40,15 +40,17 @@ public class UserController {
             return Result.error(301, "账号或密码错误");
         }
         Map<String, Object> m = new HashMap();
-        m.put("userId", userId);
-        m.put("userIdentity",userservice.getUserIdentity(userId));
-        m.put("userAccount",userservice.getUserById(userId).getUserAccount());
-        m.put("userName",userservice.getUserById(userId).getUserName());
-        m.put("userIcon",userservice.getUserById(userId).getUserIcon());
-        m.put("userProfile",userservice.getUserById(userId).getUserProfile());
+        LoginUserInfo l = new LoginUserInfo();
+        l.setId(userId);
+        l.setAccount(userservice.getUserById(userId).getUserAccount());
+        l.setName(userservice.getUserById(userId).getUserName());
+        l.setIcon(userservice.getUserById(userId).getUserIcon());
+        l.setProfile(userservice.getUserById(userId).getUserProfile());
+        l.setIdentity(userservice.getUserIdentity(userId));
+        m.put("user",l);
         response.setHeader("refresh_token", JwtUtil.createRefreshJavaWebToken(m));
         response.setHeader("access_token",JwtUtil.createAccessJavaWebToken(m));
-        return new Result(200,"登录成功");
+        return new Result(200,"登录成功",m);
     }
 
 
