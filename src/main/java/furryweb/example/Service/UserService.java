@@ -129,6 +129,9 @@ public class UserService {
         userInfoEntity.setUserIdentity(identity);
         userRepository.save(userInfoEntity);
     }
+    public UserInfoEntity getUserById(int userId){
+        return userRepository.findByUserId(userId);
+    }
     public boolean getUserVerifyInfo(int userId){
         return userRepository.findByUserId(userId).isUserIdentityVerify();
     }

@@ -41,6 +41,11 @@ public class UserController {
         }
         Map<String, Object> m = new HashMap();
         m.put("userId", userId);
+        m.put("userIdentity",userservice.getUserIdentity(userId));
+        m.put("userAccount",userservice.getUserById(userId).getUserAccount());
+        m.put("userName",userservice.getUserById(userId).getUserName());
+        m.put("userIcon",userservice.getUserById(userId).getUserIcon());
+        m.put("userProfile",userservice.getUserById(userId).getUserProfile());
         response.setHeader("refresh_token", JwtUtil.createRefreshJavaWebToken(m));
         response.setHeader("access_token",JwtUtil.createAccessJavaWebToken(m));
         return new Result(200,"登录成功");
