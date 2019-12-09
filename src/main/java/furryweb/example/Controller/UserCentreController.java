@@ -56,28 +56,7 @@ public class UserCentreController {
             return Result.error(611, "资料保存失败");
         }
     }
-
-
-    @RequestMapping(value = "/upload/icon", method = RequestMethod.POST)
-    public Result uploadIcon(@RequestBody MultipartFile file) {
-        if (file.isEmpty()) {
-            response.setStatus(500);
-            return Result.error(610, "上传失败");
-        }
-        int begin = file.getOriginalFilename().indexOf(".");
-        int last = file.getOriginalFilename().length();
-        String fileName = UuidUtil.getUUID() + file.getOriginalFilename().substring(begin, last);
-        String localPath = webUploadPath;
-        if (FileUtil.upload(file, localPath, fileName)) {
-            // 上传成功，给出页面提示
-            Map<String, Object> iconName = new HashMap<>();
-            iconName.put("fileName", fileName);
-            return new Result(200, "头像上传成功", iconName);
-        } else {
-            response.setStatus(500);
-            return Result.error(610, "上传失败");
-        }
-    }
+    
 
     @RequestMapping(value = "/user/centreinfo/{userId}", method = RequestMethod.GET)
     public Result userCentre(@PathVariable("userId") int userId) {
@@ -112,12 +91,20 @@ public class UserCentreController {
     }
 
     @RequestMapping(value = "/upload/{type}", method = RequestMethod.POST)
-    public Result identityPicture(@RequestBody MultipartFile[] file, @PathVariable("type") int tyep) {
+    public Result identityPicture(@RequestBody MultipartFile[] file, @PathVariable("type") int type) {
         if (file == null) {
             return Result.error(610, "上传失败");
         }
         List<String> filesName = new ArrayList<>();
-        String localPath = webUploadPath;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(webUploadPath);
+        if(type == 0) {
+            stringBuilder.append("/icon");
+        }
+        if(type == 1){
+            stringBuilder.append("/verify");
+        }
+        String localPath = stringBuilder.toString();
         for (int i = 0; i < file.length; i++) {
             int begin = file[i].getOriginalFilename().indexOf(".");
             int last = file[i].getOriginalFilename().length();
@@ -165,14 +152,14 @@ public class UserCentreController {
     @RequestMapping(value = "/getidentity/{userId}", method = RequestMethod.GET)
     public Result getIdentity(@PathVariable int userId) {
         try {
-            Map<String,Object> identity = new HashMap<>();
-            identity.put("identity",userService.getUserIdentity(userId));
-            identity.put("verify",userService.getUserVerifyInfo(userId));
-            return new Result(200,"返回身份信息成功",identity);
-        }catch (Exception e){
+            Map<String, Object> identity = new HashMap<>();
+            identity.put("identity", userService.getUserIdentity(userId));
+            identity.put("verify", userService.getUserVerifyInfo(userId));
+            return new Result(200, "返回身份信息成功", identity);
+        } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(500);
-            return Result.error(625,"返回身份信息失败");
+            return Result.error(625, "返回身份信息失败");
         }
     }
 }
