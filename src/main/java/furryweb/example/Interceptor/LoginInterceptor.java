@@ -2,15 +2,12 @@ package furryweb.example.Interceptor;
 
 import furryweb.example.Util.JwtUtil;
 import org.springframework.lang.Nullable;
-import org.springframework.web.method.HandlerMethod;
+
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,16 +20,19 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        String accessToken = request.getHeader("access_token");
-        String refreshToken = request.getHeader("refresh_token");
+        String accessToken = request.getHeader("accessToken");
+        String refreshToken = request.getHeader("refreshToken");
+        System.out.println("accessToken:"+accessToken);
+        System.out.println("refreshToken:"+refreshToken);
+
         if (JwtUtil.getUserIdByparserJavaWebToken(accessToken) != -1) {
             //表示token合法
             return true;
         } else if (JwtUtil.getUserIdByparserJavaWebToken(refreshToken)!=-1) {
             Map<String, Object> jwtClaims = new HashMap();
             jwtClaims.put("userId",JwtUtil.getUserIdByparserJavaWebToken(refreshToken));
-            response.setHeader("access_token",JwtUtil.createAccessJavaWebToken(jwtClaims));
-            response.setHeader("refresh_token",JwtUtil.createRefreshJavaWebToken(jwtClaims));
+            response.setHeader("accessToken",JwtUtil.createAccessJavaWebToken(jwtClaims));
+            response.setHeader("refreshToken",JwtUtil.createRefreshJavaWebToken(jwtClaims));
             return true;
         } else {
             System.out.println(request.getRequestURI());

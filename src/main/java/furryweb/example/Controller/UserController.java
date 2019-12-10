@@ -50,8 +50,8 @@ public class UserController {
         m.put("user", l);
         Map<String,Object> n = new HashMap<>();
         n.put("userId",userId);
-        response.setHeader("refresh_token", JwtUtil.createRefreshJavaWebToken(n));
-        response.setHeader("access_token", JwtUtil.createAccessJavaWebToken(n));
+        response.setHeader("refreshToken", JwtUtil.createRefreshJavaWebToken(n));
+        response.setHeader("accessToken", JwtUtil.createAccessJavaWebToken(n));
         return new Result(200, "登录成功", m);
     }
 

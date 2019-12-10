@@ -133,7 +133,7 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/Identity/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/identity/{userId}", method = RequestMethod.PUT)
     public Result alteridentity(@RequestBody int identity, @PathVariable("userId") int userId) {
         try {
             if (userService.getUserVerifyInfo(userId)) {
@@ -149,7 +149,7 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/Identity/{userId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/identity/{userId}", method = RequestMethod.GET)
     public Result getIdentity(@PathVariable("userId") int userId) {
         try {
             Map<String, Object> identity = new HashMap<>();
