@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 /**
- * Created by Administrator on 2019/12/10.
+ * Created by Administrator on 2019/12/11.
  */
 @Entity
 @DynamicInsert
@@ -19,20 +19,21 @@ public class ItemInfoEntity {
     private int itemId;
 
     @NotEmpty(message = "项目名不能为空")
-    @Size(min = 3,max = 20,message = "项目名长度在3-20之间")
+    @Size(max = 20,message = "项目名长度最大为20")
     private String itemName;
-    @Size(max = 250,message = "项目描述不超过250字")
+    @Size(max = 250,message = "项目描述长度最大为250")
     private String itemDescribe;
     private Integer itemTime;
-    @NotEmpty(message = "发布者id不能为空")
     private int publisherId;
+    @NotEmpty(message = "价格不能为空")
     private int price;
     private Integer applyNum;
     private String tag;
     private Timestamp createTime;
     private Timestamp updateTime;
-    private String itemInfocol1;
-    private String itemInfocol2;
+    private String itemPictureName;
+    private Boolean itemVerify;
+    private String itemInfocol;
 
     @Id
     @Column(name = "item_id")
@@ -135,23 +136,33 @@ public class ItemInfoEntity {
     }
 
     @Basic
-    @Column(name = "item_infocol1")
-    public String getItemInfocol1() {
-        return itemInfocol1;
+    @Column(name = "item_picture_name")
+    public String getItemPictureName() {
+        return itemPictureName;
     }
 
-    public void setItemInfocol1(String itemInfocol1) {
-        this.itemInfocol1 = itemInfocol1;
+    public void setItemPictureName(String itemPictureName) {
+        this.itemPictureName = itemPictureName;
     }
 
     @Basic
-    @Column(name = "item_infocol2")
-    public String getItemInfocol2() {
-        return itemInfocol2;
+    @Column(name = "item_verify")
+    public Boolean getItemVerify() {
+        return itemVerify;
     }
 
-    public void setItemInfocol2(String itemInfocol2) {
-        this.itemInfocol2 = itemInfocol2;
+    public void setItemVerify(Boolean itemVerify) {
+        this.itemVerify = itemVerify;
+    }
+
+    @Basic
+    @Column(name = "item_infocol")
+    public String getItemInfocol() {
+        return itemInfocol;
+    }
+
+    public void setItemInfocol(String itemInfocol) {
+        this.itemInfocol = itemInfocol;
     }
 
     @Override
@@ -171,8 +182,10 @@ public class ItemInfoEntity {
         if (tag != null ? !tag.equals(that.tag) : that.tag != null) return false;
         if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
         if (updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null) return false;
-        if (itemInfocol1 != null ? !itemInfocol1.equals(that.itemInfocol1) : that.itemInfocol1 != null) return false;
-        if (itemInfocol2 != null ? !itemInfocol2.equals(that.itemInfocol2) : that.itemInfocol2 != null) return false;
+        if (itemPictureName != null ? !itemPictureName.equals(that.itemPictureName) : that.itemPictureName != null)
+            return false;
+        if (itemVerify != null ? !itemVerify.equals(that.itemVerify) : that.itemVerify != null) return false;
+        if (itemInfocol != null ? !itemInfocol.equals(that.itemInfocol) : that.itemInfocol != null) return false;
 
         return true;
     }
@@ -189,8 +202,9 @@ public class ItemInfoEntity {
         result = 31 * result + (tag != null ? tag.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
-        result = 31 * result + (itemInfocol1 != null ? itemInfocol1.hashCode() : 0);
-        result = 31 * result + (itemInfocol2 != null ? itemInfocol2.hashCode() : 0);
+        result = 31 * result + (itemPictureName != null ? itemPictureName.hashCode() : 0);
+        result = 31 * result + (itemVerify != null ? itemVerify.hashCode() : 0);
+        result = 31 * result + (itemInfocol != null ? itemInfocol.hashCode() : 0);
         return result;
     }
 }

@@ -109,33 +109,38 @@ public class UserService {
         return userRepository.findByUserAccount(account).getUserEmail();
     }
 
-    public void uploadIdentityInfo(IdentityForm identityForm,int userId){
+    public void uploadIdentityInfo(IdentityForm identityForm, int userId) {
         IdentityInfoEntity identityInfoEntity = new IdentityInfoEntity();
         identityInfoEntity.setUserId(userId);
         identityInfoEntity.setExplicate(identityForm.getExplicate());
         StringBuilder filesName = new StringBuilder();
-        for(int i=0;i<identityForm.getPicturesName().size();i++){
-            if(i==identityForm.getPicturesName().size()-1){
+        for (int i = 0; i < identityForm.getPicturesName().size(); i++) {
+            if (i == identityForm.getPicturesName().size() - 1) {
                 filesName.append(identityForm.getPicturesName().get(i));
+            } else {
+                filesName.append(identityForm.getPicturesName().get(i));
+                filesName.append(",");
             }
-            filesName.append(identityForm.getPicturesName().get(i)+",");
         }
         identityInfoEntity.setFilesName(filesName.toString());
         identityInfoRepository.save(identityInfoEntity);
     }
 
-    public void setIdentity(int identity,int userId){
-        UserInfoEntity userInfoEntity= userRepository.findByUserId(userId);
+    public void setIdentity(int identity, int userId) {
+        UserInfoEntity userInfoEntity = userRepository.findByUserId(userId);
         userInfoEntity.setUserIdentity(identity);
         userRepository.save(userInfoEntity);
     }
-    public UserInfoEntity getUserById(int userId){
+
+    public UserInfoEntity getUserById(int userId) {
         return userRepository.findByUserId(userId);
     }
-    public boolean getUserVerifyInfo(int userId){
+
+    public boolean getUserVerifyInfo(int userId) {
         return userRepository.findByUserId(userId).isUserIdentityVerify();
     }
-    public int getUserIdentity(int userId){
+
+    public int getUserIdentity(int userId) {
         return userRepository.findByUserId(userId).getUserIdentity();
     }
 }

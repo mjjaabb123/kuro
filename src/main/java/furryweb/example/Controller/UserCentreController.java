@@ -1,9 +1,7 @@
 package furryweb.example.Controller;
 
-import furryweb.example.Model.AlterPasswordForm;
-import furryweb.example.Model.IdentityForm;
-import furryweb.example.Model.Result;
-import furryweb.example.Model.UserInfoForm;
+import furryweb.example.Model.*;
+import furryweb.example.Service.ItemService;
 import furryweb.example.Service.UserService;
 import furryweb.example.Util.FileUtil;
 import furryweb.example.Util.JwtUtil;
@@ -38,6 +36,9 @@ public class UserCentreController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ItemService itemService;
 
     @Value("${web.upload-path}")
     private String webUploadPath;
@@ -163,6 +164,15 @@ public class UserCentreController {
         }
     }
 
-    /*@RequestMapping(value = "/commitItem/{userId}",method = RequestMethod.POST)
-    public Result commitItem(@PathVariable("userId")int userId,@RequestBody )*/
+    @RequestMapping(value = "/item/{userId}",method = RequestMethod.POST)
+    public Result commitItem(@PathVariable("userId")int userId, @RequestBody @Valid ItemForm itemForm){
+        try {
+            itemService.commitItem(itemForm,userId);
+            return new Result(200,"项目提交成功");
+        }catch (Exception e){
+            e.printStackTrace();
+            response.setStatus(500);
+            return Result.error(626,"项目提交失败");
+        }
+    }
 }
