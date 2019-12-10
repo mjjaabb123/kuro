@@ -45,7 +45,7 @@ public class UserCentreController {
     private static final Logger logger = LoggerFactory.getLogger(UserCentreController.class);
 
 
-    @RequestMapping(value = "/alterinfo/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/user/{userId}", method = RequestMethod.PUT)
     public Result alterInfo(@Valid @RequestBody UserInfoForm userInfoForm, @PathVariable("userId") int userId) {
         try {
             userService.alterInfo(userId, userInfoForm);
@@ -56,9 +56,9 @@ public class UserCentreController {
             return Result.error(611, "资料保存失败");
         }
     }
-    
 
-    @RequestMapping(value = "/user/centreinfo/{userId}", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
     public Result userCentre(@PathVariable("userId") int userId) {
         try {
             Map<String, Object> userCentreInfo = userService.getUserCentreInfo(userId);
@@ -74,7 +74,7 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/user/alterpassword/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/password/{userId}", method = RequestMethod.PUT)
     public Result userAlterPassword(@RequestBody AlterPasswordForm alterPasswordForm, @PathVariable("userId") int userId) {
         try {
             if (!alterPasswordForm.getOldPassword().equals(userService.getPasswordByUserId(userId))) {
@@ -113,27 +113,27 @@ public class UserCentreController {
                 filesName.add(fileName);
             } else {
                 response.setStatus(500);
-                return Result.error(610, "上传失败");
+                return Result.error(610, "上传图片失败");
             }
         }
         Map<String, Object> pictureName = new HashMap<>();
         pictureName.put("fileName", filesName);
-        return new Result(200, "上传成功", pictureName);
+        return new Result(200, "上传图片成功", pictureName);
     }
 
-    @RequestMapping(value = "/identity/{userId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/verify/{userId}", method = RequestMethod.POST)
     public Result identity(@RequestBody IdentityForm identityForm, @PathVariable("userId") int userId) {
         try {
             userService.uploadIdentityInfo(identityForm, userId);
-            return new Result(200, "上传成功");
+            return new Result(200, "上传身份验证信息成功");
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(500);
-            return Result.error(622, "提交身份验证失败");
+            return Result.error(622, "提交身份验证信息失败");
         }
     }
 
-    @RequestMapping(value = "/alteridentity/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/Identity/{userId}", method = RequestMethod.PUT)
     public Result alteridentity(@RequestBody int identity, @PathVariable("userId") int userId) {
         try {
             if (userService.getUserVerifyInfo(userId)) {
@@ -141,7 +141,7 @@ public class UserCentreController {
                 return new Result(200, "身份更改成功");
             }
             response.setStatus(400);
-            return Result.error(623, "请先进行画师认证");
+            return Result.error(623, "请先进行身份认证");
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(500);
@@ -149,8 +149,8 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/getidentity/{userId}", method = RequestMethod.GET)
-    public Result getIdentity(@PathVariable int userId) {
+    @RequestMapping(value = "/Identity/{userId}", method = RequestMethod.GET)
+    public Result getIdentity(@PathVariable("userId") int userId) {
         try {
             Map<String, Object> identity = new HashMap<>();
             identity.put("identity", userService.getUserIdentity(userId));
@@ -162,4 +162,7 @@ public class UserCentreController {
             return Result.error(625, "返回身份信息失败");
         }
     }
+
+    /*@RequestMapping(value = "/commitItem/{userId}",method = RequestMethod.POST)
+    public Result commitItem(@PathVariable("userId")int userId,@RequestBody )*/
 }
