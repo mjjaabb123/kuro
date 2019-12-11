@@ -46,8 +46,9 @@ public class UserCentreController {
     private static final Logger logger = LoggerFactory.getLogger(UserCentreController.class);
 
 
-    @RequestMapping(value = "/user/{userId}", method = RequestMethod.PUT)
-    public Result alterInfo(@Valid @RequestBody UserInfoForm userInfoForm, @PathVariable("userId") int userId) {
+    @RequestMapping(value = "/user", method = RequestMethod.PUT)
+    public Result alterInfo(@Valid @RequestBody UserInfoForm userInfoForm) {
+        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
         try {
             userService.alterInfo(userId, userInfoForm);
             return new Result(200, "资料保存成功");
@@ -59,8 +60,9 @@ public class UserCentreController {
     }
 
 
-    @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
-    public Result userCentre(@PathVariable("userId") int userId) {
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public Result userCentre() {
+        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
         try {
             Map<String, Object> userCentreInfo = userService.getUserCentreInfo(userId);
             if (userCentreInfo != null) {
@@ -75,8 +77,9 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/password/{userId}", method = RequestMethod.PUT)
-    public Result userAlterPassword(@RequestBody AlterPasswordForm alterPasswordForm, @PathVariable("userId") int userId) {
+    @RequestMapping(value = "/password", method = RequestMethod.PUT)
+    public Result userAlterPassword(@RequestBody AlterPasswordForm alterPasswordForm) {
+        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
         try {
             if (!alterPasswordForm.getOldPassword().equals(userService.getPasswordByUserId(userId))) {
                 response.setStatus(400);
@@ -122,8 +125,9 @@ public class UserCentreController {
         return new Result(200, "上传图片成功", pictureName);
     }
 
-    @RequestMapping(value = "/verify/{userId}", method = RequestMethod.POST)
-    public Result identity(@RequestBody IdentityForm identityForm, @PathVariable("userId") int userId) {
+    @RequestMapping(value = "/verify", method = RequestMethod.POST)
+    public Result identity(@RequestBody IdentityForm identityForm) {
+        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
         try {
             userService.uploadIdentityInfo(identityForm, userId);
             return new Result(200, "上传身份验证信息成功");
@@ -134,8 +138,9 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/identity/{userId}", method = RequestMethod.PUT)
-    public Result alteridentity(@RequestBody int identity, @PathVariable("userId") int userId) {
+    @RequestMapping(value = "/identity", method = RequestMethod.PUT)
+    public Result alteridentity(@RequestBody int identity) {
+        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
         try {
             if (userService.getUserVerifyInfo(userId)) {
                 userService.setIdentity(identity, userId);
@@ -150,8 +155,9 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/identity/{userId}", method = RequestMethod.GET)
-    public Result getIdentity(@PathVariable("userId") int userId) {
+    @RequestMapping(value = "/identity", method = RequestMethod.GET)
+    public Result getIdentity() {
+        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
         try {
             Map<String, Object> identity = new HashMap<>();
             identity.put("identity", userService.getUserIdentity(userId));
@@ -164,8 +170,12 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/item/{userId}",method = RequestMethod.POST)
-    public Result commitItem(@PathVariable("userId")int userId, @RequestBody @Valid ItemForm itemForm){
+    @RequestMapping(value = "/item",method = RequestMethod.POST)
+    public Result commitItem(@RequestBody @Valid ItemForm itemForm){
+        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
+        if(userService.getUserIdentity(userId)==0){
+            return Result.error(627,"请将身份切换为创作者");
+        }
         try {
             itemService.commitItem(itemForm,userId);
             return new Result(200,"项目提交成功");

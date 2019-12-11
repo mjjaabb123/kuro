@@ -20,10 +20,10 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        String accessToken = request.getHeader("accessToken");
-        String refreshToken = request.getHeader("refreshToken");
-        System.out.println("accessToken:"+accessToken);
-        System.out.println("refreshToken:"+refreshToken);
+        String accessToken = request.getHeader("accesstoken");
+        String refreshToken = request.getHeader("refreshtoken");
+        System.out.println("accesstoken:"+accessToken);
+        System.out.println("refreshtoken:"+refreshToken);
 
         if (JwtUtil.getUserIdByparserJavaWebToken(accessToken) != -1) {
             //表示token合法
@@ -31,8 +31,8 @@ public class LoginInterceptor implements HandlerInterceptor {
         } else if (JwtUtil.getUserIdByparserJavaWebToken(refreshToken)!=-1) {
             Map<String, Object> jwtClaims = new HashMap();
             jwtClaims.put("userId",JwtUtil.getUserIdByparserJavaWebToken(refreshToken));
-            response.setHeader("accessToken",JwtUtil.createAccessJavaWebToken(jwtClaims));
-            response.setHeader("refreshToken",JwtUtil.createRefreshJavaWebToken(jwtClaims));
+            response.setHeader("accesstoken",JwtUtil.createAccessJavaWebToken(jwtClaims));
+            response.setHeader("refreshtoken",JwtUtil.createRefreshJavaWebToken(jwtClaims));
             return true;
         } else {
             System.out.println(request.getRequestURI());
