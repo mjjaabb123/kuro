@@ -1,6 +1,7 @@
 package furryweb.example.Model;
 
 
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,14 +9,15 @@ import java.util.List;
  * Created by Administrator on 2019/12/6.
  */
 public class IdentityForm {
-    private List<String> picturesName = new ArrayList<>();
+    @NotEmpty(message = "图片不能为空")
+    private String picturesName;
     private String explicate;
 
-    public List<String> getPicturesName() {
+    public String getPicturesName() {
         return picturesName;
     }
 
-    public void setPicturesName(List<String> picturesName) {
+    public void setPicturesName(String picturesName) {
         this.picturesName = picturesName;
     }
 

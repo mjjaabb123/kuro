@@ -82,6 +82,7 @@ public class UserService {
             userInfo.put("email", userInfoEntity.getUserEmail());
             userInfo.put("icon", userInfoEntity.getUserIcon());
             userInfo.put("identity", userInfoEntity.getUserIdentity());
+            userInfo.put("account",userInfoEntity.getUserAccount());
             return userInfo;
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,16 +114,7 @@ public class UserService {
         IdentityInfoEntity identityInfoEntity = new IdentityInfoEntity();
         identityInfoEntity.setUserId(userId);
         identityInfoEntity.setExplicate(identityForm.getExplicate());
-        StringBuilder filesName = new StringBuilder();
-        for (int i = 0; i < identityForm.getPicturesName().size(); i++) {
-            if (i == identityForm.getPicturesName().size() - 1) {
-                filesName.append(identityForm.getPicturesName().get(i));
-            } else {
-                filesName.append(identityForm.getPicturesName().get(i));
-                filesName.append(",");
-            }
-        }
-        identityInfoEntity.setFilesName(filesName.toString());
+        identityInfoEntity.setFilesName(identityForm.getPicturesName());
         identityInfoRepository.save(identityInfoEntity);
     }
 

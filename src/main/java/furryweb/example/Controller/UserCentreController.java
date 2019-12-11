@@ -46,9 +46,11 @@ public class UserCentreController {
     private static final Logger logger = LoggerFactory.getLogger(UserCentreController.class);
 
 
-    @RequestMapping(value = "/user", method = RequestMethod.PUT)
-    public Result alterInfo(@Valid @RequestBody UserInfoForm userInfoForm) {
-        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
+    @RequestMapping(value = "/user/{userId}", method = RequestMethod.PUT)
+    public Result alterInfo(@Valid @RequestBody UserInfoForm userInfoForm,@PathVariable("userId")int userId) {
+        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
+            return Result.error(700,"非法操作");
+        }
         try {
             userService.alterInfo(userId, userInfoForm);
             return new Result(200, "资料保存成功");
@@ -60,9 +62,11 @@ public class UserCentreController {
     }
 
 
-    @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public Result userCentre() {
-        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
+    @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
+    public Result userCentre(@PathVariable("userId")int userId) {
+        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
+            return Result.error(700,"非法操作");
+        }
         try {
             Map<String, Object> userCentreInfo = userService.getUserCentreInfo(userId);
             if (userCentreInfo != null) {
@@ -77,9 +81,11 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/password", method = RequestMethod.PUT)
-    public Result userAlterPassword(@RequestBody AlterPasswordForm alterPasswordForm) {
-        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
+    @RequestMapping(value = "/password/{userId}", method = RequestMethod.PUT)
+    public Result userAlterPassword(@RequestBody AlterPasswordForm alterPasswordForm,@PathVariable("userId")int userId) {
+        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
+            return Result.error(700,"非法操作");
+        }
         try {
             if (!alterPasswordForm.getOldPassword().equals(userService.getPasswordByUserId(userId))) {
                 response.setStatus(400);
@@ -95,18 +101,21 @@ public class UserCentreController {
     }
 
     @RequestMapping(value = "/upload/{type}", method = RequestMethod.POST)
-    public Result identityPicture(@RequestBody MultipartFile[] file, @PathVariable("type") int type) {
+    public Result identityPicture(@RequestBody MultipartFile[] file, @PathVariable("type") String type) {
         if (file == null) {
             return Result.error(610, "上传失败");
         }
         List<String> filesName = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(webUploadPath);
-        if(type == 0) {
+        if(type.equals("icon")){
             stringBuilder.append("/icon");
         }
-        if(type == 1){
+        if(type.equals("verify")){
             stringBuilder.append("/verify");
+        }
+        if(type.equals("item")){
+            stringBuilder.append("/item");
         }
         String localPath = stringBuilder.toString();
         for (int i = 0; i < file.length; i++) {
@@ -125,9 +134,11 @@ public class UserCentreController {
         return new Result(200, "上传图片成功", pictureName);
     }
 
-    @RequestMapping(value = "/verify", method = RequestMethod.POST)
-    public Result identity(@RequestBody IdentityForm identityForm) {
-        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
+    @RequestMapping(value = "/verify/{userId}", method = RequestMethod.POST)
+    public Result identity(@RequestBody @Valid IdentityForm identityForm,@PathVariable("userId")int userId) {
+        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
+            return Result.error(700,"非法操作");
+        }
         try {
             userService.uploadIdentityInfo(identityForm, userId);
             return new Result(200, "上传身份验证信息成功");
@@ -138,9 +149,11 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/identity", method = RequestMethod.PUT)
-    public Result alteridentity(@RequestBody int identity) {
-        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
+    @RequestMapping(value = "/identity/{userId}", method = RequestMethod.PUT)
+    public Result alteridentity(@RequestBody int identity,@PathVariable("userId")int userId) {
+        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
+            return Result.error(700,"非法操作");
+        }
         try {
             if (userService.getUserVerifyInfo(userId)) {
                 userService.setIdentity(identity, userId);
@@ -155,9 +168,11 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/identity", method = RequestMethod.GET)
-    public Result getIdentity() {
-        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
+    @RequestMapping(value = "/identity/{userId}", method = RequestMethod.GET)
+    public Result getIdentity(@PathVariable(value = "userId",required = false)int userId) {
+        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
+            return Result.error(700,"非法操作");
+        }
         try {
             Map<String, Object> identity = new HashMap<>();
             identity.put("identity", userService.getUserIdentity(userId));
@@ -170,9 +185,11 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/item",method = RequestMethod.POST)
-    public Result commitItem(@RequestBody @Valid ItemForm itemForm){
-        int userId = JwtUtil.getUserIdByparserJavaWebToken(request.getHeader("refreshtoken"));
+    @RequestMapping(value = "/item/{userId}",method = RequestMethod.POST)
+    public Result commitItem(@RequestBody @Valid ItemForm itemForm,@PathVariable("userId")int userId){
+        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
+            return Result.error(700,"非法操作");
+        }
         if(userService.getUserIdentity(userId)==0){
             return Result.error(627,"请将身份切换为创作者");
         }
@@ -183,6 +200,14 @@ public class UserCentreController {
             e.printStackTrace();
             response.setStatus(500);
             return Result.error(626,"项目提交失败");
+        }
+    }
+
+    public boolean verifyIdentity(String token,int userId){
+        if (JwtUtil.getUserIdByparserJavaWebToken(token)==userId){
+            return true;
+        }else {
+            return false;
         }
     }
 }
