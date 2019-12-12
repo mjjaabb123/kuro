@@ -1,6 +1,9 @@
 package furryweb.example.Controller;
 
 import furryweb.example.Model.*;
+import furryweb.example.Model.Entity.EmailCheckEntity;
+import furryweb.example.Model.Entity.UserInfoEntity;
+import furryweb.example.Model.Form.*;
 import furryweb.example.Service.MailService;
 import furryweb.example.Service.UserService;
 import furryweb.example.Util.JwtUtil;
@@ -135,12 +138,12 @@ public class UserController {
     }
 
     @RequestMapping(value = "/checkAccount", method = RequestMethod.POST)
-    public Result checkAccount(@RequestBody String account, HttpServletResponse response) {
-        if (!userservice.findUserByAccount(account)) {
+    public Result checkAccount(@RequestBody CheckAccountForm account, HttpServletResponse response) {
+        if (!userservice.findUserByAccount(account.getAccount())) {
             response.setStatus(400);
             return Result.error(410, "账号不存在");
         }
-        String userEmail = userservice.getEmailByUserAccount(account);
+        String userEmail = userservice.getEmailByUserAccount(account.getAccount());
         String checkCode = String.valueOf(new Random().nextInt(899999) + 100000);
         String message = "您的验证码为：" + checkCode;
         try {

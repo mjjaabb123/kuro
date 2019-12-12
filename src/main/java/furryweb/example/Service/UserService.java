@@ -2,18 +2,16 @@ package furryweb.example.Service;
 
 import furryweb.example.Dao.IdentityInfoRepository;
 import furryweb.example.Dao.UserRepository;
-import furryweb.example.Model.IdentityForm;
-import furryweb.example.Model.IdentityInfoEntity;
-import furryweb.example.Model.UserInfoEntity;
-import furryweb.example.Model.UserInfoForm;
+import furryweb.example.Model.Form.IdentityForm;
+import furryweb.example.Model.Entity.IdentityInfoEntity;
+import furryweb.example.Model.Entity.UserInfoEntity;
+import furryweb.example.Model.Form.UserInfoForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by Administrator on 2019/9/29.
@@ -38,7 +36,7 @@ public class UserService {
     }
 
     public boolean findUserByAccount(String userAccount) {
-        if (userRepository.findByUserAccount(userAccount) == null) {
+        if (userRepository.findByUserAccount(userAccount)==null) {
             return false;
         } else {
             return true;
@@ -75,6 +73,7 @@ public class UserService {
         UserInfoEntity userInfoEntity = userRepository.findByUserId(userId);
         Map<String, Object> userInfo = new HashMap<>();
         try {
+            userInfo.put("id",userInfoEntity.getUserId());
             userInfo.put("name", userInfoEntity.getUserName());
             userInfo.put("qq", userInfoEntity.getUserQq());
             userInfo.put("profile", userInfoEntity.getUserProfile());

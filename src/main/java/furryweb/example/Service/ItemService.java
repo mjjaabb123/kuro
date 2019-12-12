@@ -1,8 +1,8 @@
 package furryweb.example.Service;
 
 import furryweb.example.Dao.ItemRepository;
-import furryweb.example.Model.ItemForm;
-import furryweb.example.Model.ItemInfoEntity;
+import furryweb.example.Model.Form.ItemForm;
+import furryweb.example.Model.Entity.ItemInfoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

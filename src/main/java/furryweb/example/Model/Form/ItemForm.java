@@ -1,4 +1,4 @@
-package furryweb.example.Model;
+package furryweb.example.Model.Form;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,10 @@
 package furryweb.example.Controller;
 
 import furryweb.example.Model.*;
+import furryweb.example.Model.Form.AlterPasswordForm;
+import furryweb.example.Model.Form.IdentityForm;
+import furryweb.example.Model.Form.ItemForm;
+import furryweb.example.Model.Form.UserInfoForm;
 import furryweb.example.Service.ItemService;
 import furryweb.example.Service.UserService;
 import furryweb.example.Util.FileUtil;
@@ -17,9 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,9 +49,9 @@ public class UserCentreController {
 
 
     @RequestMapping(value = "/user/{userId}", method = RequestMethod.PUT)
-    public Result alterInfo(@Valid @RequestBody UserInfoForm userInfoForm,@PathVariable("userId")int userId) {
-        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
-            return Result.error(700,"非法操作");
+    public Result alterInfo(@Valid @RequestBody UserInfoForm userInfoForm, @PathVariable(value = "userId", required = false) int userId) {
+        if (!verifyIdentity(request.getHeader("refreshtoken"), userId)) {
+            return Result.error(700, "非法操作");
         }
         try {
             userService.alterInfo(userId, userInfoForm);
@@ -63,9 +65,9 @@ public class UserCentreController {
 
 
     @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
-    public Result userCentre(@PathVariable("userId")int userId) {
-        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
-            return Result.error(700,"非法操作");
+    public Result userCentre(@PathVariable(value = "userId", required = false) int userId) {
+        if (!verifyIdentity(request.getHeader("refreshtoken"), userId)) {
+            return Result.error(700, "非法操作");
         }
         try {
             Map<String, Object> userCentreInfo = userService.getUserCentreInfo(userId);
@@ -82,9 +84,9 @@ public class UserCentreController {
     }
 
     @RequestMapping(value = "/password/{userId}", method = RequestMethod.PUT)
-    public Result userAlterPassword(@RequestBody AlterPasswordForm alterPasswordForm,@PathVariable("userId")int userId) {
-        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
-            return Result.error(700,"非法操作");
+    public Result userAlterPassword(@RequestBody AlterPasswordForm alterPasswordForm, @PathVariable(value = "userId", required = false) int userId) {
+        if (!verifyIdentity(request.getHeader("refreshtoken"), userId)) {
+            return Result.error(700, "非法操作");
         }
         try {
             if (!alterPasswordForm.getOldPassword().equals(userService.getPasswordByUserId(userId))) {
@@ -101,43 +103,41 @@ public class UserCentreController {
     }
 
     @RequestMapping(value = "/upload/{type}", method = RequestMethod.POST)
-    public Result identityPicture(@RequestBody MultipartFile[] file, @PathVariable("type") String type) {
-        if (file == null) {
+    public Result identityPicture(@RequestBody MultipartFile file, @PathVariable("type") String type) {
+        if (file.isEmpty()) {
             return Result.error(610, "上传失败");
         }
-        List<String> filesName = new ArrayList<>();
+        String fileName = "";
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(webUploadPath);
-        if(type.equals("icon")){
+        if (type.equals("icon")) {
             stringBuilder.append("/icon");
         }
-        if(type.equals("verify")){
+        if (type.equals("verify")) {
             stringBuilder.append("/verify");
         }
-        if(type.equals("item")){
+        if (type.equals("item")) {
             stringBuilder.append("/item");
         }
         String localPath = stringBuilder.toString();
-        for (int i = 0; i < file.length; i++) {
-            int begin = file[i].getOriginalFilename().indexOf(".");
-            int last = file[i].getOriginalFilename().length();
-            String fileName = UuidUtil.getUUID() + file[i].getOriginalFilename().substring(begin, last);
-            if (FileUtil.upload(file[i], localPath, fileName)) {
-                filesName.add(fileName);
-            } else {
-                response.setStatus(500);
-                return Result.error(610, "上传图片失败");
-            }
+        int begin = file.getOriginalFilename().indexOf(".");
+        int last = file.getOriginalFilename().length();
+        fileName = UuidUtil.getUUID() + file.getOriginalFilename().substring(begin, last);
+        if (FileUtil.upload(file, localPath, fileName)) {
+            Map<String, Object> pictureName = new HashMap<>();
+            pictureName.put("fileName", fileName);
+            return new Result(200, "上传图片成功", pictureName);
+        } else {
+            response.setStatus(500);
+            return Result.error(610, "上传图片失败");
         }
-        Map<String, Object> pictureName = new HashMap<>();
-        pictureName.put("fileName", filesName);
-        return new Result(200, "上传图片成功", pictureName);
     }
 
+
     @RequestMapping(value = "/verify/{userId}", method = RequestMethod.POST)
-    public Result identity(@RequestBody @Valid IdentityForm identityForm,@PathVariable("userId")int userId) {
-        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
-            return Result.error(700,"非法操作");
+    public Result identity(@RequestBody @Valid IdentityForm identityForm, @PathVariable(value = "userId", required = false) int userId) {
+        if (!verifyIdentity(request.getHeader("refreshtoken"), userId)) {
+            return Result.error(700, "非法操作");
         }
         try {
             userService.uploadIdentityInfo(identityForm, userId);
@@ -150,9 +150,9 @@ public class UserCentreController {
     }
 
     @RequestMapping(value = "/identity/{userId}", method = RequestMethod.PUT)
-    public Result alteridentity(@RequestBody int identity,@PathVariable("userId")int userId) {
-        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
-            return Result.error(700,"非法操作");
+    public Result alteridentity(@RequestBody int identity, @PathVariable(value = "userId", required = false) int userId) {
+        if (!verifyIdentity(request.getHeader("refreshtoken"), userId)) {
+            return Result.error(700, "非法操作");
         }
         try {
             if (userService.getUserVerifyInfo(userId)) {
@@ -169,9 +169,9 @@ public class UserCentreController {
     }
 
     @RequestMapping(value = "/identity/{userId}", method = RequestMethod.GET)
-    public Result getIdentity(@PathVariable(value = "userId",required = false)int userId) {
-        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
-            return Result.error(700,"非法操作");
+    public Result getIdentity(@PathVariable(value = "userId", required = false) int userId) {
+        if (!verifyIdentity(request.getHeader("refreshtoken"), userId)) {
+            return Result.error(700, "非法操作");
         }
         try {
             Map<String, Object> identity = new HashMap<>();
@@ -185,28 +185,28 @@ public class UserCentreController {
         }
     }
 
-    @RequestMapping(value = "/item/{userId}",method = RequestMethod.POST)
-    public Result commitItem(@RequestBody @Valid ItemForm itemForm,@PathVariable("userId")int userId){
-        if(!verifyIdentity(request.getHeader("refreshtoken"),userId)){
-            return Result.error(700,"非法操作");
+    @RequestMapping(value = "/item/{userId}", method = RequestMethod.POST)
+    public Result commitItem(@RequestBody @Valid ItemForm itemForm, @PathVariable(value = "userId", required = false) int userId) {
+        if (!verifyIdentity(request.getHeader("refreshtoken"), userId)) {
+            return Result.error(700, "非法操作");
         }
-        if(userService.getUserIdentity(userId)==0){
-            return Result.error(627,"请将身份切换为创作者");
+        if (userService.getUserIdentity(userId) == 0) {
+            return Result.error(627, "请将身份切换为创作者");
         }
         try {
-            itemService.commitItem(itemForm,userId);
-            return new Result(200,"项目提交成功");
-        }catch (Exception e){
+            itemService.commitItem(itemForm, userId);
+            return new Result(200, "项目提交成功");
+        } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(500);
-            return Result.error(626,"项目提交失败");
+            return Result.error(626, "项目提交失败");
         }
     }
 
-    public boolean verifyIdentity(String token,int userId){
-        if (JwtUtil.getUserIdByparserJavaWebToken(token)==userId){
+    public boolean verifyIdentity(String token, int userId) {
+        if (JwtUtil.getUserIdByparserJavaWebToken(token) == userId) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
